@@ -14,6 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Arrays;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,8 +55,7 @@ public class RestControllerTest {
         Contact contact = new Contact("test@test.com", "Mel", "Swanson", "987");
         repository.save(contact);
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/contacts/v1")
-                .param("email","test@test.com"))
+                .get("/contacts/v1/email/test@test.com"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\n" +
                         "  \"firstName\":\"Mel\",\n" +
@@ -67,9 +68,30 @@ public class RestControllerTest {
     @Test
     public void getContactByEmailReturns404() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/contacts/v1")
-                .param("email","test@test.com"))
+                .get("/contacts/v1/email/test@test.com"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getContactByNameReturnsOk() throws Exception {
+        Contact contact1 = new Contact("test@test.com", "mel", "swanson", "987");
+        Contact contact2 = new Contact("roger@that.com", "roger", "mel", "987");
+        repository.saveAll(Arrays.asList(contact1, contact2));
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/contacts/v1/name/mel")
+                .param("page","1")
+                .param("size","10"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[{\n" +
+                        "  \"firstName\":\"mel\",\n" +
+                        "  \"lastName\":\"swanson\",\n" +
+                        "  \"email\":\"test@test.com\",\n" +
+                        "  \"phone\":\"987\"\n" +
+                        "}," +
+                        "{\"email\":\"roger@that.com\"," +
+                        "\"firstName\":\"roger\"," +
+                        "\"lastName\":\"mel\"," +
+                        "\"phone\":\"987\"}]"));
     }
 
     @After

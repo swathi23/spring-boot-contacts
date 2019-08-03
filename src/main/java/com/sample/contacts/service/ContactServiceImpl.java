@@ -5,8 +5,11 @@ import com.sample.contacts.models.ContactNotFoundException;
 import com.sample.contacts.models.ContactRequest;
 import com.sample.contacts.models.DatabaseException;
 import com.sample.contacts.repository.ContactRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,5 +36,11 @@ public class ContactServiceImpl implements ContactService {
             return contact.get();
         }
         throw new ContactNotFoundException("Couldn't fetch contact by email");
+    }
+
+    @Override
+    public List<Contact> getContactByName(String name, int page, int size) {
+        Page<Contact> contacts = repository.findByFirstNameIsLikeOrLastNameIsLike(PageRequest.of(page - 1, size), name, name);
+        return contacts.getContent();
     }
 }

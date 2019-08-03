@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @org.springframework.web.bind.annotation.RestController
 @RequestMapping("/contacts/v1")
@@ -23,9 +24,17 @@ public class RestController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @GetMapping()
-    public ResponseEntity getContactByEmail(@RequestParam(value = "email") String email) {
+    @GetMapping("/email/{email}")
+    public ResponseEntity getContactByEmail(@PathVariable(name = "email") String email) {
         Contact contact = contactService.getContactByEmail(email);
+        return new ResponseEntity(contact, HttpStatus.OK);
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity getContactByName(@PathVariable(name = "name") String name,
+                                           @RequestParam(name = "page", defaultValue = "1") int page,
+                                           @RequestParam(name = "size", defaultValue = "10") int size) {
+        List<Contact> contact = contactService.getContactByName(name, page, size);
         return new ResponseEntity(contact, HttpStatus.OK);
     }
 }
