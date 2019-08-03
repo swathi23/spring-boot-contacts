@@ -3,6 +3,7 @@ package com.sample.contacts.controller;
 
 import com.sample.contacts.models.Contact;
 import com.sample.contacts.repository.ContactRepository;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -45,5 +47,35 @@ public class RestControllerTest {
         Assert.assertEquals("Snow", contact.getLastName());
         Assert.assertEquals("123456", contact.getPhone());
     }
+
+    @Test
+    public void getContactByEmailReturnsOk() throws Exception {
+        Contact contact = new Contact("test@test.com", "Mel", "Swanson", "987");
+        repository.save(contact);
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/contacts/v1")
+                .param("email","test@test.com"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\n" +
+                        "  \"firstName\":\"Mel\",\n" +
+                        "  \"lastName\":\"Swanson\",\n" +
+                        "  \"email\":\"test@test.com\",\n" +
+                        "  \"phone\":\"987\"\n" +
+                        "}"));
+    }
+
+    @Test
+    public void getContactByEmailReturns404() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/contacts/v1")
+                .param("email","test@test.com"))
+                .andExpect(status().isNotFound());
+    }
+
+    @After
+    public void tearDown() {
+        repository.deleteAll();
+    }
+
 
 }

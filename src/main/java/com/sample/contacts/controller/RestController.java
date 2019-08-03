@@ -1,5 +1,6 @@
 package com.sample.contacts.controller;
 
+import com.sample.contacts.models.Contact;
 import com.sample.contacts.models.ContactRequest;
 import com.sample.contacts.service.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +21,11 @@ public class RestController {
     public ResponseEntity addContact(@RequestBody ContactRequest request) throws IOException {
         contactService.addContact(request);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping()
+    public ResponseEntity getContactByEmail(@RequestParam(value = "email") String email) {
+        Contact contact = contactService.getContactByEmail(email);
+        return new ResponseEntity(contact, HttpStatus.OK);
     }
 }
