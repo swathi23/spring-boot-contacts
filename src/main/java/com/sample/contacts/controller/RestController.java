@@ -37,4 +37,10 @@ public class RestController {
         List<Contact> contact = contactService.getContactByName(name, page, size);
         return new ResponseEntity(contact, HttpStatus.OK);
     }
+
+    @DeleteMapping("/email/{email}")
+    public ResponseEntity deleteByEmail(@PathVariable(name = "email") String email) {
+        contactService.deleteContact(email);
+        return new ResponseEntity(HttpStatus.OK);
+    }
 }

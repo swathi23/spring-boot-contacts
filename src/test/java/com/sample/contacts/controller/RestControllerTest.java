@@ -94,6 +94,31 @@ public class RestControllerTest {
                         "\"phone\":\"987\"}]"));
     }
 
+    @Test
+    public void deleteContactByEmail() throws Exception {
+        Contact contact = new Contact("test@test.com", "Mel", "Swanson", "987");
+        repository.save(contact);
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/contacts/v1/email/test@test.com"))
+                .andExpect(status().isOk());
+
+        boolean exists = repository.findById("test@test.com").isPresent();
+        Assert.assertFalse(exists);
+    }
+
+    @Test
+    public void deleteContactByEmailReturnsErrorWhenEmailDoesntExist() throws Exception {
+        Contact contact = new Contact("test@test.com", "Mel", "Swanson", "987");
+        repository.save(contact);
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/contacts/v1/email/random@test.com"))
+                .andExpect(status().isNotFound());
+
+        boolean exists = repository.findById("test@test.com").isPresent();
+        Assert.assertTrue(exists);
+    }
+
+
     @After
     public void tearDown() {
         repository.deleteAll();

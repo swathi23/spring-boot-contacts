@@ -11,4 +11,6 @@ public interface ContactService {
     Contact getContactByEmail(String email);
 
     List<Contact> getContactByName(String name, int page, int size);
+
+    void deleteContact(String email);
 }
